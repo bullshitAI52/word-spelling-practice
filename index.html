@@ -392,6 +392,62 @@
                 margin: 0 clamp(2px, 1vw, 10px);
             }
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-text {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -427,6 +483,20 @@
 
     <div class="fullscreen-spell" id="spellContainer">
         <button class="close-spell" onclick="closeSpelling()">×</button>
+    </div>
+
+    <!-- Resume Modal -->
+    <div class="modal-overlay" id="resumeModal">
+        <div class="modal-card">
+            <div class="modal-title">发现上次练习进度</div>
+            <div class="modal-text" id="resumeText">
+                你上次练习到了 第 <span id="savedParams" style="font-weight:bold; color:#007BFF">1</span> 页，是否继续？
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="handleResume(false)">🔄 重新开始</button>
+                <button class="btn btn-primary" onclick="handleResume(true)">🔙 继续练习</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -481,6 +551,14 @@
                     return { filename, content };
                 }
                 return null;
+            },
+
+            savePage(page) {
+                localStorage.setItem('last_page', page);
+            },
+
+            loadPage() {
+                return parseInt(localStorage.getItem('last_page') || 1);
             }
         };
 
@@ -610,6 +688,7 @@
 
         function renderPage(page) {
             currentPage = page;
+            DataPersistence.savePage(page); // Save current page
             const start = (page - 1) * WORDS_PER_PAGE;
 
             if (displayData.length === 0) {
@@ -851,12 +930,22 @@
             const lastSession = DataPersistence.load();
             if (lastSession) {
                 console.log('从上次会话恢复数据:', lastSession.filename);
-                parseCSVData(lastSession.content, lastSession.filename, false); // false = don't save again
+                // Load data but don't render page immediately if we need to ask user
+                parseCSVData(lastSession.content, lastSession.filename, false);
 
                 // Add visual cue
                 const status = document.querySelector('.file-status');
                 status.innerHTML += ' <span style="font-size:10px; color:#999;">(自动恢复)</span>';
                 hideFileInput();
+
+                // Check saved page
+                const savedPage = DataPersistence.loadPage();
+                if (savedPage > 1) {
+                    showResumeModal(savedPage);
+                } else {
+                    renderPage(1);
+                    renderPagination();
+                }
                 return;
             }
 
@@ -890,6 +979,22 @@
             showExampleData();
         }
 
+        function showResumeModal(page) {
+            document.getElementById('savedParams').textContent = page;
+            document.getElementById('resumeModal').style.display = 'flex';
+        }
+
+        function handleResume(resume) {
+            document.getElementById('resumeModal').style.display = 'none';
+            if (resume) {
+                const savedPage = DataPersistence.loadPage();
+                renderPage(savedPage);
+            } else {
+                renderPage(1);
+            }
+            renderPagination();
+        }
+
         function parseCSVData(text, filename, save = true) {
             allWordData = text.split('\n').map(line => {
                 const parts = line.split(',');
@@ -900,14 +1005,20 @@
             }).filter(word => word && word.english && word.chinese);
 
             if (allWordData.length > 0) {
-                if (save) DataPersistence.save(filename, text);
+                if (save) {
+                    DataPersistence.save(filename, text);
+                    DataPersistence.savePage(1); // Reset page on new file load
+                }
 
                 document.querySelector('.file-status').textContent = `已加载: ${filename} (${allWordData.length}个单词)`;
                 document.querySelector('.file-status').style.color = '#28a745';
 
                 filterData();
-                renderPage(1);
-                renderPagination();
+
+                if (save) {
+                    renderPage(1);
+                    renderPagination();
+                }
             } else {
                 showExampleData();
             }
