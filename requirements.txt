@@ -1,0 +1,4 @@
+pandas
+genanki
+gtts
+playsound

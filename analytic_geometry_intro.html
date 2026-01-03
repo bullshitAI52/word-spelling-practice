@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ 小朋友的解析几何探险：用数字画画！</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f8ff; /* 淡蓝色背景 */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #ff6347; /* 番茄红 */
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #4682b4; /* 钢蓝色 */
+            font-size: 2.2em;
+            border-bottom: 3px solid #4682b4;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #20b2aa; /* 浅海绿色 */
+            font-size: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .highlight {
+            background-color: #fffacd; /* 柠檬绸色 */
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #daaa00;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        .example-box {
+            background-color: #e0ffff; /* 淡青色 */
+            border-left: 6px solid #20b2aa; /* 浅海绿色 */
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .interactive-section {
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .interactive-section input[type="number"],
+        .interactive-section input[type="text"] {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 80px;
+            text-align: center;
+        }
+        .interactive-section button {
+            padding: 10px 20px;
+            background-color: #6a5acd; /* 石板蓝 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .interactive-section button:hover {
+            background-color: #483d8b;
+        }
+        #coordinateCanvas {
+            border: 1px solid #ccc;
+            background-color: #fdfdfd;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #coordinateInfo {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #4682b4;
+        }
+        .quiz-options button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 12px;
+            background-color: #87ceeb; /* 天蓝色 */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .quiz-options button:hover {
+            background-color: #6495ed; /* 矢车菊蓝 */
+            transform: translateY(-2px);
+        }
+        .quiz-options button.correct {
+            background-color: #32cd32; /* 酸橙绿 */
+        }
+        .quiz-options button.incorrect {
+            background-color: #ff4500; /* 橙红色 */
+        }
+        .quizFeedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #777;
+        }
+        .math-formula {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.2em;
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .quiz-section {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+        }
+        .quiz-item {
+            margin-bottom: 25px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 20px;
+        }
+        .quiz-item:last-child {
+            border-bottom: none;
+        }
+        .quiz-item p {
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .quiz-item .quiz-options button {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ 小朋友的解析几何探险：用数字画画！</h1>
+        <p>同学们，你们已经学会了用数字（代数）来计算，也学会了用图形（几何）来认识世界。今天，我们要学习一种更酷的魔法——<span class="highlight">解析几何</span>！</p>
+        <p>解析几何就像一座神奇的桥梁，它能把<span class="highlight">数字和图形连接起来</span>，让我们既能用数字来描述图形，也能用算式来解决图形的问题！</p>
+        <p>想象一下，你是一个<span class="highlight">数学世界的探险家</span>，而解析几何就是你的<span class="highlight">超级工具箱</span>，里面装满了能让你在地图上精准定位、规划路线、甚至画出秘密基地的神奇工具！</p>
+
+        <h2>第一站：数学世界的GPS——坐标系</h2>
+        <p>在我们的数学探险地图上，怎么找到一个准确的位置呢？解析几何的秘密武器就是<span class="highlight">平面直角坐标系</span>！它就像一个超级精准的GPS系统！</p>
+        <p>它有两条互相垂直的“高速公路”：</p>
+        <ul>
+            <li>**横线：** 叫做 <span class="highlight">x轴</span>（想象成东西方向的马路）。</li>
+            <li>**竖线：** 叫做 <span class="highlight">y轴</span>（想象成南北方向的马路）。</li>
+            <li>两条“高速公路”的交汇点，就是我们探险的起点——<span class="highlight">原点</span>，它的地址永远是 <span class="math-formula">(0, 0)</span>。</li>
+        </ul>
+        <p>地图上的每一个“宝藏点”，都可以用一对独特的数字来表示，这对数字就是它的<span class="highlight">坐标</span>，通常写成 <span class="math-formula">(x, y)</span>。就像你家的门牌号一样，独一无二！</p>
+
+        <div class="interactive-section">
+            <h3>点击地图，找到宝藏的坐标！</h3>
+            <canvas id="coordinateCanvas" width="500" height="500"></canvas>
+            <div id="coordinateInfo">点击坐标系上的任意位置，看看它的秘密地址！</div>
+        </div>
+
+        <h2>第二站：宝藏点之间——距离和中点</h2>
+        <p>既然我们能找到宝藏点的位置，那从一个宝藏点到另一个宝藏点有多远呢？它们正中间的“秘密联络站”又在哪里呢？</p>
+        <p>解析几何能用简单的代数方法帮我们解决这些几何问题！</p>
+        <ul>
+            <li>**距离：** 就像你在地图上从一个秘密基地走到另一个秘密基地，需要走多远。我们可以用你学过的<span class="highlight">勾股定理</span>（还记得直角三角形的秘密吗？）来计算！</li>
+            <li>**中点：** 就像两个宝藏点之间，那个不偏不倚的“中转站”。它的坐标就是两个点各自坐标的平均值。是不是很公平？</li>
+        </ul>
+        <div class="example-box">
+            <h4>例子：计算秘密联络站的地址</h4>
+            <p>如果宝藏点A的地址是 <span class="math-formula">(2, 3)</span>，宝藏点B的地址是 <span class="math-formula">(8, 7)</span>。</p>
+            <p>那么它们的中点M的x坐标是 <span class="math-formula">(2 + 8) / 2 = 5</span>。</p>
+            <p>中点M的y坐标是 <span class="math-formula">(3 + 7) / 2 = 5</span>。</p>
+            <p>所以秘密联络站M的地址是 <span class="math-formula">(5, 5)</span>！</p>
+        </div>
+
+        <h2>第三站：机器人行走的路线——直线方程</h2>
+        <p>我们不仅可以用坐标表示一个点，还可以用一个“秘密指令”（代数方程）来指挥机器人画出一条线！最简单、最常见的指令就是画<span class="highlight">直线</span>。</p>
+        <p>你学过函数 <span class="math-formula">y = kx + b</span>，它就是指挥机器人画直线的“秘密指令”！</p>
+        <ul>
+            <li><span class="math-formula">k</span> 叫做<span class="highlight">斜率</span>：它决定了机器人行走的“坡度”或“倾斜程度”。<span class="math-formula">k</span> 越大，路线越陡峭，机器人爬得越费劲；<span class="math-formula">k</span> 是正数，机器人向上爬；<span class="math-formula">k</span> 是负数，机器人向下溜；<span class="math-formula">k = 0</span>，机器人走在平坦的地面上。</li>
+            <li><span class="math-formula">b</span> 叫做<span class="highlight">y轴截距</span>：它决定了机器人从哪里开始它的旅程，也就是路线和y轴的交点。</li>
+        </ul>
+
+        <div class="interactive-section">
+            <h3>指挥机器人，画出你的直线！</h3>
+            <p><span class="math-formula">y =</span> <input type="number" id="inputK" value="1" step="0.1" style="width: 60px;"> <span class="math-formula">x +</span> <input type="number" id="inputB" value="0" step="0.1" style="width: 60px;"> </p>
+            <button id="drawLineButton">开始画线！</button>
+            <canvas id="lineCanvas" width="500" height="500"></canvas>
+            <p style="font-size: 0.9em; color: #666;">（提示：改变 k 和 b 的值，看看机器人画出的路线有什么不同！）</p>
+        </div>
+
+        <h2>第四站：完美圆圈的秘密——圆的方程</h2>
+        <p>除了直线，我们还可以用“秘密指令”来画出完美的圆圈！</p>
+        <p>一个圆，只要知道它的<span class="highlight">圆心坐标</span> <span class="math-formula">(a, b)</span>（圆的中心在哪里）和<span class="highlight">半径</span> <span class="math-formula">r</span>（圆有多大），我们就能写出它的“秘密指令”：</p>
+        <p style="font-size: 1.3em; font-weight: bold; text-align: center;"><span class="math-formula">(x - a)^2 + (y - b)^2 = r^2</span></p>
+        <p>是不是很神奇？一个简单的算式，就能画出一个完美的圆！就像给机器人一个指令，它就能画出一个完美的圆形跑道！</p>
+
+        <h2>解析几何有什么用？—— 超级工具箱的应用！</h2>
+        <p>解析几何可不是只在数学课本里有用，它在我们的现实世界中，就像一个超级工具箱，解决着各种各样的问题！</p>
+        <ul>
+            <li>**游戏和动画：** 游戏里人物的移动、物体的碰撞、摄像机的视角，都离不开解析几何的精确计算。没有它，游戏人物就不能在屏幕上准确地跑跳！</li>
+            <li>**导航和定位：** 你的手机地图、汽车导航、GPS定位，都是通过计算坐标和距离来实现的。解析几何就是它们背后的“大脑”！</li>
+            <li>**工程设计：** 建筑师设计大楼、工程师设计桥梁、飞机，都需要精确计算各种图形的位置和尺寸。解析几何帮助他们把图纸上的线条变成现实中的宏伟建筑！</li>
+            <li>**机器人：** 机器人如何知道自己的位置，如何避开障碍物，如何抓取物品，都离不开解析几何的“指引”。</li>
+        </ul>
+
+        <h2>小练习：考考你，小探险家！</h2>
+        <div class="quiz-section">
+            <div class="quiz-item">
+                <p>1. 点 <span class="math-formula">(-3, 5)</span> 在坐标系的哪个“区域”？</p>
+                <div class="quiz-options">
+                    <button data-quiz="q1" data-answer="A">A. 第一象限 (x>0, y>0)</button>
+                    <button data-quiz="q1" data-answer="B">B. 第二象限 (x<0, y>0)</button>
+                    <button data-quiz="q1" data-answer="C">C. 第三象限 (x<0, y<0)</button>
+                    <button data-quiz="q1" data-answer="D">D. 第四象限 (x>0, y<0)</button>
+                </div>
+                <div id="quizFeedback_q1" class="quizFeedback"></div>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. 直线 <span class="math-formula">y = -2x + 3</span> 的斜率 <span class="math-formula">k</span> 是多少？这条直线是向上倾斜还是向下倾斜？</p>
+                <div class="quiz-options">
+                    <button data-quiz="q2" data-answer="A">A. k=2，向上倾斜</button>
+                    <button data-quiz="q2" data-answer="B">B. k=-2，向上倾斜</button>
+                    <button data-quiz="q2" data-answer="C">C. k=2，向下倾斜</button>
+                    <button data-quiz="q2" data-answer="D">D. k=-2，向下倾斜</button>
+                </div>
+                <div id="quizFeedback_q2" class="quizFeedback"></div>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. 点 <span class="math-formula">(1, 4)</span> 是否在直线 <span class="math-formula">y = 3x + 1</span> 这条“机器人路线”上？</p>
+                <div class="quiz-options">
+                    <button data-quiz="q3" data-answer="A">A. 是</button>
+                    <button data-quiz="q3" data-answer="B">B. 否</button>
+                </div>
+                <div id="quizFeedback_q3" class="quizFeedback"></div>
+            </div>
+        </div>
+
+        <h2>总结与展望</h2>
+        <p>恭喜你！你已经完成了解析几何的初步探险！</p>
+        <ul>
+            <li>解析几何是连接<span class="highlight">代数和几何</span>的超级桥梁。</li>
+            <li>我们用<span class="highlight">坐标系</span>来给点“定位”，就像数学世界的GPS。</li>
+            <li>用<span class="highlight">方程</span>来描述直线和圆等图形，就像给机器人下达“秘密指令”。</li>
+            <li>解析几何在<span class="highlight">生活和科技</span>中无处不在，是解决实际问题的超级工具！</li>
+        </ul>
+        <p>解析几何的世界还有很多奥秘等着你去发现，比如抛物线、椭圆、双曲线等等。继续保持好奇心，用数字和图形去探索更广阔的数学世界吧！也许未来的游戏设计师、机器人工程师就是你哦！</p>
+
+        <footer>
+            <p>&copy; 2025 小朋友的数学探险队</p>
+            <p>希望这个教程能帮助你爱上解析几何！</p>
+        </footer>
+    </div>
+
+    <script>
+        // 坐标系互动逻辑
+        const coordinateCanvas = document.getElementById('coordinateCanvas');
+        const ctxCoord = coordinateCanvas.getContext('2d');
+        const coordinateInfo = document.getElementById('coordinateInfo');
+
+        const CANVAS_WIDTH_COORD = coordinateCanvas.width;
+        const CANVAS_HEIGHT_COORD = coordinateCanvas.height;
+        const SCALE_COORD = 25; // 每个单位的像素数
+        const ORIGIN_X_COORD = CANVAS_WIDTH_COORD / 2;
+        const ORIGIN_Y_COORD = CANVAS_HEIGHT_COORD / 2;
+
+        function drawCoordinateAxes() {
+            ctxCoord.clearRect(0, 0, CANVAS_WIDTH_COORD, CANVAS_HEIGHT_COORD);
+            ctxCoord.strokeStyle = '#ccc';
+            ctxCoord.lineWidth = 1;
+
+            // Draw grid lines
+            ctxCoord.beginPath();
+            for (let i = 0; i <= CANVAS_WIDTH_COORD; i += SCALE_COORD) {
+                ctxCoord.moveTo(i, 0);
+                ctxCoord.lineTo(i, CANVAS_HEIGHT_COORD);
+                ctxCoord.moveTo(0, i);
+                ctxCoord.lineTo(CANVAS_WIDTH_COORD, i);
+            }
+            ctxCoord.stroke();
+
+            // Draw X-axis
+            ctxCoord.strokeStyle = '#333';
+            ctxCoord.lineWidth = 2;
+            ctxCoord.beginPath();
+            ctxCoord.moveTo(0, ORIGIN_Y_COORD);
+            ctxCoord.lineTo(CANVAS_WIDTH_COORD, ORIGIN_Y_COORD);
+            ctxCoord.stroke();
+
+            // Draw Y-axis
+            ctxCoord.beginPath();
+            ctxCoord.moveTo(ORIGIN_X_COORD, 0);
+            ctxCoord.lineTo(ORIGIN_X_COORD, CANVAS_HEIGHT_COORD);
+            ctxCoord.stroke();
+
+            // Draw origin label
+            ctxCoord.fillStyle = '#333';
+            ctxCoord.font = '12px Arial';
+            ctxCoord.fillText('0', ORIGIN_X_COORD + 5, ORIGIN_Y_COORD + 15);
+            ctxCoord.fillText('x', CANVAS_WIDTH_COORD - 15, ORIGIN_Y_COORD - 5);
+            ctxCoord.fillText('y', ORIGIN_X_COORD + 5, 15);
+
+            // Draw scale labels
+            for (let i = SCALE_COORD; i < ORIGIN_X_COORD; i += SCALE_COORD) {
+                ctxCoord.fillText(String(i / SCALE_COORD), ORIGIN_X_COORD + i + 2, ORIGIN_Y_COORD + 15);
+                ctxCoord.fillText(String(-i / SCALE_COORD), ORIGIN_X_COORD - i - 15, ORIGIN_Y_COORD + 15);
+                ctxCoord.fillText(String(-i / SCALE_COORD), ORIGIN_X_COORD + 5, ORIGIN_Y_COORD + i + 5);
+                ctxCoord.fillText(String(i / SCALE_COORD), ORIGIN_X_COORD + 5, ORIGIN_Y_COORD - i - 5);
+            }
+        }
+
+        drawCoordinateAxes();
+
+        coordinateCanvas.addEventListener('click', (event) => {
+            const rect = coordinateCanvas.getBoundingClientRect();
+            const pixelX = event.clientX - rect.left;
+            const pixelY = event.clientY - rect.top;
+
+            // Convert pixel coordinates to mathematical coordinates
+            const mathX = ((pixelX - ORIGIN_X_COORD) / SCALE_COORD).toFixed(1);
+            const mathY = ((ORIGIN_Y_COORD - pixelY) / SCALE_COORD).toFixed(1);
+
+            coordinateInfo.textContent = `你点击了点 (${mathX}, ${mathY})！这是一个秘密宝藏点！`;
+
+            // Draw the clicked point
+            drawCoordinateAxes(); // Redraw axes to clear previous point
+            ctxCoord.fillStyle = '#ff6347';
+            ctxCoord.beginPath();
+            ctxCoord.arc(pixelX, pixelY, 5, 0, Math.PI * 2);
+            ctxCoord.fill();
+        });
+
+        // 直线绘制逻辑
+        const lineCanvas = document.getElementById('lineCanvas');
+        const ctxLine = lineCanvas.getContext('2d');
+        const inputK = document.getElementById('inputK');
+        const inputB = document.getElementById('inputB');
+        const drawLineButton = document.getElementById('drawLineButton');
+
+        const CANVAS_WIDTH_LINE = lineCanvas.width;
+        const CANVAS_HEIGHT_LINE = lineCanvas.height;
+        const SCALE_LINE = 25; // 每个单位的像素数
+        const ORIGIN_X_LINE = CANVAS_WIDTH_LINE / 2;
+        const ORIGIN_Y_LINE = CANVAS_HEIGHT_LINE / 2;
+
+        function drawLineAxes() {
+            ctxLine.clearRect(0, 0, CANVAS_WIDTH_LINE, CANVAS_HEIGHT_LINE);
+            ctxLine.strokeStyle = '#ccc';
+            ctxLine.lineWidth = 1;
+
+            // Draw grid lines
+            ctxLine.beginPath();
+            for (let i = 0; i <= CANVAS_WIDTH_LINE; i += SCALE_LINE) {
+                ctxLine.moveTo(i, 0);
+                ctxLine.lineTo(i, CANVAS_HEIGHT_LINE);
+                ctxLine.moveTo(0, i);
+                ctxLine.lineTo(CANVAS_WIDTH_LINE, i);
+            }
+            ctxLine.stroke();
+
+            // Draw X-axis
+            ctxLine.strokeStyle = '#333';
+            ctxLine.lineWidth = 2;
+            ctxLine.beginPath();
+            ctxLine.moveTo(0, ORIGIN_Y_LINE);
+            ctxLine.lineTo(CANVAS_WIDTH_LINE, ORIGIN_Y_LINE);
+            ctxLine.stroke();
+
+            // Draw Y-axis
+            ctxLine.beginPath();
+            ctxLine.moveTo(ORIGIN_X_LINE, 0);
+            ctxLine.lineTo(ORIGIN_X_LINE, CANVAS_HEIGHT_LINE);
+            ctxLine.stroke();
+
+            // Draw origin label
+            ctxLine.fillStyle = '#333';
+            ctxLine.font = '12px Arial';
+            ctxLine.fillText('0', ORIGIN_X_LINE + 5, ORIGIN_Y_LINE + 15);
+            ctxLine.fillText('x', CANVAS_WIDTH_LINE - 15, ORIGIN_Y_LINE - 5);
+            ctxLine.fillText('y', ORIGIN_X_LINE + 5, 15);
+
+            // Draw scale labels
+            for (let i = SCALE_LINE; i < ORIGIN_X_LINE; i += SCALE_LINE) {
+                ctxLine.fillText(String(i / SCALE_LINE), ORIGIN_X_LINE + i + 2, ORIGIN_Y_LINE + 15);
+                ctxLine.fillText(String(-i / SCALE_LINE), ORIGIN_X_LINE - i - 15, ORIGIN_Y_LINE + 15);
+                ctxLine.fillText(String(-i / SCALE_LINE), ORIGIN_X_LINE + 5, ORIGIN_Y_LINE + i + 5);
+                ctxLine.fillText(String(i / SCALE_LINE), ORIGIN_X_LINE + 5, ORIGIN_Y_LINE - i - 5);
+            }
+        }
+
+        function drawLineGraph() {
+            drawLineAxes(); // Clear and redraw axes
+
+            let k = parseFloat(inputK.value);
+            let b = parseFloat(inputB.value);
+
+            if (isNaN(k)) k = 1; // Default value
+            if (isNaN(b)) b = 0; // Default value
+
+            ctxLine.strokeStyle = '#ff6347'; // Line color
+            ctxLine.lineWidth = 3;
+
+            ctxLine.beginPath();
+            // Iterate through x values from left to right of the canvas
+            for (let pixelX = 0; pixelX <= CANVAS_WIDTH_LINE; pixelX++) {
+                // Convert pixelX to mathematical x
+                let mathX = (pixelX - ORIGIN_X_LINE) / SCALE_LINE;
+                // Calculate mathematical y
+                let mathY = k * mathX + b;
+                // Convert mathematical y to pixelY
+                let pixelY = ORIGIN_Y_LINE - (mathY * SCALE_LINE);
+
+                if (pixelX === 0) {
+                    ctxLine.moveTo(pixelX, pixelY);
+                } else {
+                    ctxLine.lineTo(pixelX, pixelY);
+                }
+            }
+            ctxLine.stroke();
+        }
+
+        drawLineButton.addEventListener('click', drawLineGraph);
+        inputK.addEventListener('input', drawLineGraph);
+        inputB.addEventListener('input', drawLineGraph);
+
+        // Initial draw
+        drawLineGraph();
+
+        // 小练习逻辑
+        const quizAnswers = {
+            q1: 'B', // (-3, 5) -> x<0, y>0 -> 第二象限
+            q2: 'D', // y = -2x + 3 -> k = -2 -> 向下倾斜
+            q3: 'A'  // y = 3x + 1, x=1 -> y = 3*1 + 1 = 4. (1,4)在直线上
+        };
+
+        document.querySelectorAll('.quiz-options').forEach(optionsDiv => {
+            optionsDiv.addEventListener('click', (event) => {
+                const clickedButton = event.target;
+                if (clickedButton.tagName === 'BUTTON') {
+                    const quizId = clickedButton.dataset.quiz;
+                    const selectedAnswer = clickedButton.dataset.answer;
+                    const feedbackDiv = document.getElementById(`quizFeedback_${quizId}`);
+
+                    // 移除同组所有按钮的正确/错误样式
+                    Array.from(optionsDiv.children).forEach(btn => {
+                        btn.classList.remove('correct', 'incorrect');
+                    });
+
+                    if (selectedAnswer === quizAnswers[quizId]) {
+                        feedbackDiv.style.color = '#32cd32';
+                        feedbackDiv.textContent = '太棒了！回答正确！';
+                        clickedButton.classList.add('correct');
+                    } else {
+                        feedbackDiv.style.color = '#ff4500';
+                        feedbackDiv.textContent = '再想想哦，这个答案不对。' + getHint(quizId, selectedAnswer);
+                        clickedButton.classList.add('incorrect');
+                    }
+                }
+            });
+        });
+
+        function getHint(quizId, selectedAnswer) {
+            if (quizId === 'q1') {
+                return '回忆一下坐标系四个象限的 x 和 y 值的正负。';
+            } else if (quizId === 'q2') {
+                return '直线的斜率 k 决定了倾斜方向，k>0 向上，k<0 向下。';
+            } else if (quizId === 'q3') {
+                return '把点的 x 坐标代入直线方程，看看算出来的 y 坐标是不是和点的 y 坐标一样。';
+            }
+            return '';
+        }
+
+    </script>
+</body>
+</html>

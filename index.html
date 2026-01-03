@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语单词拼写检测</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f7fa;
+            padding: 10px;
+        }
+
+        .header {
+            text-align: center;
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: bold;
+            color: #007BFF;
+            margin-bottom: 15px;
+        }
+
+        .control-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .control-bar > * {
+            flex-shrink: 0;
+        }
+
+        .time-display {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-status {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .word-item {
+            padding: 20px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .word-item:last-child {
+            border-bottom: none;
+        }
+
+        .chinese-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            text-align: left;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-box {
+            flex: 1;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007BFF;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-box:focus {
+            border-color: #007BFF;
+            background-color: white;
+        }
+
+        .check-icon {
+            font-size: 24px;
+            min-width: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .btn-icon {
+            min-width: 44px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-sound {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-sound:hover {
+            background-color: #1e7e34;
+        }
+
+        .btn-spell {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-spell:hover {
+            background-color: #e0a800;
+        }
+
+        .pagination {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            min-width: 44px;
+            min-height: 44px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .pagination button.active {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: #e9ecef;
+        }
+
+        .fullscreen-spell {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.95);
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .spell-letter {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: clamp(40px, 12vw, 100px);
+            margin: 0 clamp(5px, 2vw, 20px);
+            opacity: 0;
+            position: relative;
+            animation: letterAppear 0.5s forwards;
+        }
+
+        @keyframes letterAppear {
+            from { 
+                opacity: 0; 
+                transform: translateY(-30px) scale(0.8); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .close-spell {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .control-bar {
+                padding: 10px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-bar > * {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+            
+            .control-bar > *:last-child {
+                margin-bottom: 0;
+            }
+            
+            .word-item {
+                padding: 15px 10px;
+            }
+            
+            .chinese-text {
+                font-size: 16px;
+            }
+            
+            .input-box {
+                font-size: 16px;
+                padding: 10px;
+            }
+            
+            .pagination {
+                padding: 15px 10px;
+                gap: 5px;
+            }
+            
+            .pagination button {
+                min-width: 40px;
+                min-height: 40px;
+                font-size: 14px;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 480px) {
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .spell-letter {
+                margin: 0 clamp(2px, 1vw, 10px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">英语单词拼写检测</div>
+    
+    <div class="control-bar">
+        <div class="time-display" id="currentTime"></div>
+        
+        <div class="file-input-wrapper">
+            <input type="file" id="fileInput" accept=".txt,.csv">
+            <button class="btn btn-primary">📁 选择文件</button>
+        </div>
+        
+        <div class="file-status">正在加载...</div>
+        
+        <button id="timerBtn" class="btn btn-secondary">⏱️ 开始计时</button>
+        <span id="elapsedTimeDisplay">已用时间: 0 秒</span>
+        <button id="screenshotBtn" class="btn btn-secondary">📷 截图保存</button>
+    </div>
+
+    <div class="container">
+        <div id="wordList"></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <div class="fullscreen-spell" id="spellContainer">
+        <button class="close-spell" onclick="closeSpelling()">×</button>
+    </div>
+
+    <script>
+        let wordData = [];
+        let currentPage = 1;
+        let startTime;
+        let spellTimeout;
+        const WORDS_PER_PAGE = 3; // 移动端减少每页显示数量
+        const youdaoAPI = 'https://dict.youdao.com/dictvoice?audio=';
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = `当前时间: ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+        }
+        setInterval(updateTime, 60000);
+        updateTime();
+
+        // 文件输入处理
+        document.querySelector('.file-input-wrapper button').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('timerBtn').addEventListener('click', () => {
+            if (!startTime) {
+                startTime = Date.now();
+                document.getElementById('timerBtn').textContent = '⏸️ 停止计时';
+                setInterval(() => {
+                    if (startTime) {
+                        let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                        document.getElementById('elapsedTimeDisplay').textContent = `已用时间: ${elapsed} 秒`;
+                    }
+                }, 1000);
+            } else {
+                startTime = null;
+                document.getElementById('timerBtn').textContent = '⏱️ 开始计时';
+            }
+        });
+
+        document.getElementById('screenshotBtn').addEventListener('click', () => {
+            html2canvas(document.body, {
+                scale: window.devicePixelRatio || 1,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `拼写检测截图_${new Date().toISOString().slice(0,19)}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    parseCSVData(e.target.result, file.name);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function renderPage(page) {
+            currentPage = page;
+            const start = (page - 1) * WORDS_PER_PAGE;
+            const words = wordData.slice(start, start + WORDS_PER_PAGE);
+            document.getElementById('wordList').innerHTML = words.map((word, index) => `
+                <div class="word-item">
+                    <div class="chinese-text">${word.chinese}</div>
+                    <div class="input-container">
+                        <input type="text" class="input-box" 
+                               placeholder="请输入英文单词..." 
+                               oninput="checkSpelling(this, '${word.english}', this.nextElementSibling)"
+                               autocomplete="off"
+                               autocorrect="off"
+                               autocapitalize="off"
+                               spellcheck="false">
+                        <span class="check-icon">❌</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-icon btn-sound" onclick="playSound('${word.english}')" title="播放发音">🔊</button>
+                        <button class="btn-icon btn-spell" onclick="showSpelling('${word.english}')" title="拼写示范">✏️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(wordData.length / WORDS_PER_PAGE);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // 上一页按钮
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.innerHTML = '‹ 上一页';
+                prevButton.addEventListener('click', () => {
+                    renderPage(currentPage - 1);
+                    renderPagination();
+                });
+                pagination.appendChild(prevButton);
+            }
+            
+            // 页码按钮（显示当前页前后各2页）
+            const start = Math.max(1, currentPage - 2);
+            const end = Math.min(totalPages, currentPage + 2);
+            
+            if (start > 1) {
+                const firstButton = document.createElement('button');
+                firstButton.textContent = '1';
+                firstButton.addEventListener('click', () => {
+                    renderPage(1);
+                    renderPagination();
+                });
+                pagination.appendChild(firstButton);
+                
+                if (start > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '0 10px';
+                    pagination.appendChild(ellipsis);
+                }
+            }
+            
+            for (let i = start; i <= end; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.classList.toggle('active', i === currentPage);
+                button.addEventListener('click', () => {
+                    renderPage(i);
+                    renderPagination();
+                });
+                pagination.appendChild(button);
+            }
+            
+            if (end < totalPages) {
+                if (end < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '0 10px';
+                    pagination.appendChild(ellipsis);
+                }
+                
+                const lastButton = document.createElement('button');
+                lastButton.textContent = totalPages;
+                lastButton.addEventListener('click', () => {
+                    renderPage(totalPages);
+                    renderPagination();
+                });
+                pagination.appendChild(lastButton);
+            }
+            
+            // 下一页按钮
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.innerHTML = '下一页 ›';
+                nextButton.addEventListener('click', () => {
+                    renderPage(currentPage + 1);
+                    renderPagination();
+                });
+                pagination.appendChild(nextButton);
+            }
+        }
+
+        function checkSpelling(input, correctWord, icon) {
+            const userInput = input.value.trim().toLowerCase();
+            const correct = correctWord.toLowerCase();
+            
+            if (userInput === correct) {
+                icon.innerHTML = "✅";
+                icon.style.color = "green";
+                icon.style.display = "inline";
+                input.style.borderColor = "#28a745";
+                input.style.backgroundColor = "#d4edda";
+            } else if (userInput === '') {
+                icon.style.display = "none";
+                input.style.borderColor = "#ddd";
+                input.style.backgroundColor = "#fafafa";
+            } else {
+                icon.innerHTML = "❌";
+                icon.style.color = "red";
+                icon.style.display = "inline";
+                input.style.borderColor = "#dc3545";
+                input.style.backgroundColor = "#f8d7da";
+            }
+        }
+
+        function playSound(word) {
+            try {
+                const audio = new Audio(`${youdaoAPI}${encodeURIComponent(word)}&type=1`);
+                audio.play().catch(e => {
+                    console.log('音频播放失败:', e);
+                    // 可以添加备用发音源或提示
+                });
+            } catch (e) {
+                console.log('创建音频失败:', e);
+            }
+        }
+
+        function showSpelling(word) {
+            if (spellTimeout) {
+                clearTimeout(spellTimeout);
+            }
+            
+            const spellContainer = document.getElementById('spellContainer');
+            const letters = word.split('');
+            
+            spellContainer.innerHTML = `
+                <button class="close-spell" onclick="closeSpelling()">×</button>
+                ${letters.map((letter, index) => `
+                    <span class="spell-letter" style="animation-delay: ${index * 0.3}s">${letter}</span>
+                `).join('')}
+            `;
+            
+            spellContainer.style.display = 'flex';
+            
+            // 自动关闭并播放发音
+            spellTimeout = setTimeout(() => {
+                closeSpelling();
+                playSound(word);
+            }, (letters.length * 300) + 2000);
+        }
+
+        function closeSpelling() {
+            document.getElementById('spellContainer').style.display = 'none';
+            if (spellTimeout) {
+                clearTimeout(spellTimeout);
+                spellTimeout = null;
+            }
+        }
+
+        // 添加触摸事件支持
+        document.addEventListener('touchstart', function() {}, true);
+
+        // 防止双击缩放
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (this.lastTouchEnd && now - this.lastTouchEnd < 350) {
+                event.preventDefault();
+            }
+            this.lastTouchEnd = now;
+        }, false);
+
+        // 页面加载时自动尝试加载同目录下的CSV文件
+        async function autoLoadCSV() {
+            const csvFiles = [
+                'B3U7 ART P113.csv',
+                'words.csv',
+                'vocabulary.csv',
+                'data.csv'
+            ];
+            
+            for (let filename of csvFiles) {
+                try {
+                    const response = await fetch(filename);
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text.trim()) {
+                            console.log(`成功加载文件: ${filename}`);
+                            parseCSVData(text, filename);
+                            hideFileInput();
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.log(`尝试加载 ${filename} 失败:`, error);
+                }
+            }
+            
+            // 如果没有找到CSV文件，显示示例数据和文件选择按钮
+            console.log('未找到CSV文件，显示示例数据');
+            showExampleData();
+        }
+
+        function parseCSVData(text, filename) {
+            wordData = text.split('\n').map(line => {
+                const parts = line.split(',');
+                return parts.length >= 2 ? { 
+                    english: parts[0].trim(), 
+                    chinese: parts.slice(1).join(',').trim() 
+                } : null;
+            }).filter(word => word && word.english && word.chinese);
+            
+            if (wordData.length > 0) {
+                document.querySelector('.file-status').textContent = `已加载: ${filename} (${wordData.length}个单词)`;
+                document.querySelector('.file-status').style.color = '#28a745';
+                renderPage(1);
+                renderPagination();
+            } else {
+                showExampleData();
+            }
+        }
+
+        function hideFileInput() {
+            const fileWrapper = document.querySelector('.file-input-wrapper');
+            fileWrapper.style.display = 'none';
+        }
+
+        function showExampleData() {
+            wordData = [
+                { english: 'hello', chinese: '你好' },
+                { english: 'world', chinese: '世界' },
+                { english: 'computer', chinese: '计算机' },
+                { english: 'mobile', chinese: '移动的' },
+                { english: 'tablet', chinese: '平板电脑' }
+            ];
+            document.querySelector('.file-status').textContent = '使用示例数据 (5个单词)';
+            document.querySelector('.file-status').style.color = '#ffc107';
+            renderPage(1);
+            renderPagination();
+        }
+
+        // 页面加载完成后自动尝试加载CSV
+        document.addEventListener('DOMContentLoaded', autoLoadCSV);
+    </script>
+
+</body>
+</html>
