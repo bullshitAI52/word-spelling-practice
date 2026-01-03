@@ -448,10 +448,107 @@
             gap: 15px;
             justify-content: center;
         }
+
+        /* Library Sidebar */
+        .library-drawer {
+            position: fixed;
+            left: -260px;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1500;
+            transition: left 0.3s ease;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .library-drawer.open {
+            left: 0;
+        }
+
+        .library-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+        }
+
+        .library-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .library-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .library-item:hover {
+            background-color: #f0f7ff;
+            color: #007BFF;
+        }
+
+        .library-item.active {
+            background-color: #e6f2ff;
+            color: #007BFF;
+            font-weight: bold;
+            border-left: 3px solid #007BFF;
+        }
+
+        .library-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1400;
+            background: white;
+            border: 1px solid #ddd;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- Library Toggle Button -->
+    <button class="library-toggle" onclick="toggleLibrary()" title="打开词库列表">📚</button>
+
+    <!-- Library Drawer -->
+    <div class="library-drawer" id="libraryDrawer">
+        <div class="library-header">
+            <span>我的词库</span>
+            <span style="font-size:14px; cursor:pointer;" onclick="toggleLibrary()">✕</span>
+        </div>
+        <div style="margin-bottom:15px;">
+            <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none"
+                onchange="handleFolderSelect(this)">
+            <button class="btn btn-primary" onclick="document.getElementById('folderInput').click()"
+                style="width:100%; font-size:12px;">📂 导入词库文件夹</button>
+        </div>
+        <ul class="library-list" id="libraryList">
+            <li class="library-item" style="color:#999; text-align:center;">暂无词库<br>请点击上方按钮导入</li>
+        </ul>
+    </div>
 
     <div class="header">英语单词拼写检测</div>
 
@@ -1047,6 +1144,61 @@
 
         // 页面加载完成后自动尝试加载CSV
         document.addEventListener('DOMContentLoaded', autoLoadCSV);
+
+        // --- Library Feature ---
+        let libraryFiles = [];
+
+        function toggleLibrary() {
+            const drawer = document.getElementById('libraryDrawer');
+            drawer.classList.toggle('open');
+        }
+
+        function handleFolderSelect(input) {
+            const files = Array.from(input.files).filter(f => f.name.endsWith('.csv') || f.name.endsWith('.txt'));
+            if (files.length === 0) {
+                alert('未找到CSV或TXT文件');
+                return;
+            }
+
+            // Sort files by name naturally
+            files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+            libraryFiles = files;
+
+            renderLibraryList();
+        }
+
+        function renderLibraryList() {
+            const list = document.getElementById('libraryList');
+            list.innerHTML = libraryFiles.map((file, index) => `
+                <li class="library-item" onclick="loadLibraryFile(${index})">
+                    ${file.name}
+                </li>
+            `).join('');
+        }
+
+        function loadLibraryFile(index) {
+            const file = libraryFiles[index];
+            if (!file) return;
+
+            // Highlight active item
+            document.querySelectorAll('.library-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                // Reset page to 1 when explicitly selecting from library
+                // But parseCSVData handles persistence... 
+                // We want to treat this as a fresh load.
+                parseCSVData(e.target.result, file.name);
+
+                // Close drawer on mobile only
+                if (window.innerWidth < 768) {
+                    toggleLibrary();
+                }
+            };
+            reader.readAsText(file);
+        }
     </script>
 
 </body>
