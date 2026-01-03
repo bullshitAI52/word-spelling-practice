@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,10 +37,10 @@
             padding: 15px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .control-bar > * {
+        .control-bar>* {
             flex-shrink: 0;
         }
 
@@ -64,6 +65,59 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+        }
+
+        .mode-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #666;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background-color: #007BFF;
+            color: white;
+            border-color: #007BFF;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .word-stats {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f0f0f0;
+        }
+
+        .stat-badge.wrong {
+            color: #dc3545;
+            background: #ffe6e6;
+        }
+
+        .stat-badge.correct {
+            color: #28a745;
+            background: #e6ffea;
         }
 
         .btn-primary {
@@ -101,7 +155,7 @@
         .container {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -230,7 +284,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0, 0, 0, 0.95);
             color: white;
             display: none;
             justify-content: center;
@@ -251,13 +305,14 @@
         }
 
         @keyframes letterAppear {
-            from { 
-                opacity: 0; 
-                transform: translateY(-30px) scale(0.8); 
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.8);
             }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
         }
 
@@ -265,7 +320,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
             font-size: 24px;
@@ -280,40 +335,40 @@
             body {
                 padding: 5px;
             }
-            
+
             .control-bar {
                 padding: 10px;
                 flex-direction: column;
                 align-items: stretch;
             }
-            
-            .control-bar > * {
+
+            .control-bar>* {
                 width: 100%;
                 margin-bottom: 8px;
             }
-            
-            .control-bar > *:last-child {
+
+            .control-bar>*:last-child {
                 margin-bottom: 0;
             }
-            
+
             .word-item {
                 padding: 15px 10px;
             }
-            
+
             .chinese-text {
                 font-size: 16px;
             }
-            
+
             .input-box {
                 font-size: 16px;
                 padding: 10px;
             }
-            
+
             .pagination {
                 padding: 15px 10px;
                 gap: 5px;
             }
-            
+
             .pagination button {
                 min-width: 40px;
                 min-height: 40px;
@@ -326,33 +381,40 @@
             .action-buttons {
                 justify-content: center;
             }
-            
+
             .btn-icon {
                 width: 40px;
                 height: 40px;
                 font-size: 16px;
             }
-            
+
             .spell-letter {
                 margin: 0 clamp(2px, 1vw, 10px);
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="header">英语单词拼写检测</div>
-    
+
     <div class="control-bar">
+        <div class="mode-bar">
+            <button class="mode-btn active" onclick="switchMode('all')">📚 全部练习</button>
+            <button class="mode-btn" onclick="switchMode('new')">🆕 未背诵</button>
+            <button class="mode-btn" onclick="switchMode('mistake')">❌ 易错题</button>
+        </div>
+
         <div class="time-display" id="currentTime"></div>
-        
+
         <div class="file-input-wrapper">
             <input type="file" id="fileInput" accept=".txt,.csv">
             <button class="btn btn-primary">📁 选择文件</button>
         </div>
-        
+
         <div class="file-status">正在加载...</div>
-        
+
         <button id="timerBtn" class="btn btn-secondary">⏱️ 开始计时</button>
         <span id="elapsedTimeDisplay">已用时间: 0 秒</span>
         <button id="screenshotBtn" class="btn btn-secondary">📷 截图保存</button>
@@ -368,12 +430,87 @@
     </div>
 
     <script>
-        let wordData = [];
+        let allWordData = []; // Store complete dataset
+        let displayData = []; // Store filtered data for display
         let currentPage = 1;
         let startTime;
         let spellTimeout;
-        const WORDS_PER_PAGE = 3; // 移动端减少每页显示数量
+        let currentMode = 'all'; // 'all', 'new', 'mistake'
+        const WORDS_PER_PAGE = 3;
         const youdaoAPI = 'https://dict.youdao.com/dictvoice?audio=';
+
+        // --- Stats Manager ---
+        const WordStats = {
+            storageKey: 'word_spelling_stats',
+            data: {},
+
+            init() {
+                const stored = localStorage.getItem(this.storageKey);
+                if (stored) {
+                    this.data = JSON.parse(stored);
+                }
+            },
+
+            save() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+            },
+
+            get(word) {
+                return this.data[word] || { correct: 0, wrong: 0, lastPracticed: 0 };
+            },
+
+            update(word, isCorrect) {
+                if (!this.data[word]) {
+                    this.data[word] = { correct: 0, wrong: 0, lastPracticed: 0 };
+                }
+                const stat = this.data[word];
+                if (isCorrect) stat.correct++;
+                else stat.wrong++;
+                stat.lastPracticed = Date.now();
+                this.save();
+            }
+        };
+
+        WordStats.init();
+
+        function switchMode(mode) {
+            currentMode = mode;
+
+            // Update UI
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active'); // Note: this relies on event bubbling/binding
+
+            filterData();
+            currentPage = 1;
+            renderPage(1);
+            renderPagination();
+        }
+
+        function filterData() {
+            if (currentMode === 'all') {
+                displayData = [...allWordData];
+            } else if (currentMode === 'new') {
+                displayData = allWordData.filter(w => {
+                    const stats = WordStats.get(w.english);
+                    return stats.correct === 0 && stats.wrong === 0;
+                });
+            } else if (currentMode === 'mistake') {
+                displayData = allWordData.filter(w => {
+                    const stats = WordStats.get(w.english);
+                    return stats.wrong > 0 && (stats.wrong > stats.correct); // Only showing words where errors exceed correct answers, or just any error? User said "易错题". Let's simply show any that have errors > 0 for now, sorted by error count.
+                }).sort((a, b) => {
+                    const statsA = WordStats.get(a.english);
+                    const statsB = WordStats.get(b.english);
+                    return statsB.wrong - statsA.wrong; // Descending order of mistakes
+                });
+            }
+
+            // If mistake/new mode is empty, show alert or fallback? 
+            if (displayData.length === 0 && allWordData.length > 0) {
+                // Optional: Auto-switch back or show empty state. 
+                // For now just letting it render empty list 
+            }
+        }
 
         function updateTime() {
             const now = new Date();
@@ -409,17 +546,17 @@
                 useCORS: true
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `拼写检测截图_${new Date().toISOString().slice(0,19)}.png`;
+                link.download = `拼写检测截图_${new Date().toISOString().slice(0, 19)}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
             });
         });
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
+        document.getElementById('fileInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     parseCSVData(e.target.result, file.name);
                 };
                 reader.readAsText(file);
@@ -429,10 +566,23 @@
         function renderPage(page) {
             currentPage = page;
             const start = (page - 1) * WORDS_PER_PAGE;
-            const words = wordData.slice(start, start + WORDS_PER_PAGE);
-            document.getElementById('wordList').innerHTML = words.map((word, index) => `
+
+            if (displayData.length === 0) {
+                document.getElementById('wordList').innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">当前模式下没有单词哦 🎉</div>`;
+                return;
+            }
+
+            const words = displayData.slice(start, start + WORDS_PER_PAGE);
+            document.getElementById('wordList').innerHTML = words.map((word, index) => {
+                const stats = WordStats.get(word.english);
+                return `
                 <div class="word-item">
                     <div class="chinese-text">${word.chinese}</div>
+                    <div class="word-stats">
+                        历史记录: 
+                        <span class="stat-badge correct">✅ ${stats.correct}</span>
+                        <span class="stat-badge wrong">❌ ${stats.wrong}</span>
+                    </div>
                     <div class="input-container">
                         <input type="text" class="input-box" 
                                placeholder="请输入英文单词..." 
@@ -448,16 +598,16 @@
                         <button class="btn-icon btn-spell" onclick="showSpelling('${word.english}')" title="拼写示范">✏️</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderPagination() {
-            const totalPages = Math.ceil(wordData.length / WORDS_PER_PAGE);
+            const totalPages = Math.ceil(displayData.length / WORDS_PER_PAGE);
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
-            
+
             if (totalPages <= 1) return;
-            
+
             // 上一页按钮
             if (currentPage > 1) {
                 const prevButton = document.createElement('button');
@@ -468,11 +618,11 @@
                 });
                 pagination.appendChild(prevButton);
             }
-            
+
             // 页码按钮（显示当前页前后各2页）
             const start = Math.max(1, currentPage - 2);
             const end = Math.min(totalPages, currentPage + 2);
-            
+
             if (start > 1) {
                 const firstButton = document.createElement('button');
                 firstButton.textContent = '1';
@@ -481,7 +631,7 @@
                     renderPagination();
                 });
                 pagination.appendChild(firstButton);
-                
+
                 if (start > 2) {
                     const ellipsis = document.createElement('span');
                     ellipsis.textContent = '...';
@@ -489,7 +639,7 @@
                     pagination.appendChild(ellipsis);
                 }
             }
-            
+
             for (let i = start; i <= end; i++) {
                 const button = document.createElement('button');
                 button.textContent = i;
@@ -500,7 +650,7 @@
                 });
                 pagination.appendChild(button);
             }
-            
+
             if (end < totalPages) {
                 if (end < totalPages - 1) {
                     const ellipsis = document.createElement('span');
@@ -508,7 +658,7 @@
                     ellipsis.style.padding = '0 10px';
                     pagination.appendChild(ellipsis);
                 }
-                
+
                 const lastButton = document.createElement('button');
                 lastButton.textContent = totalPages;
                 lastButton.addEventListener('click', () => {
@@ -517,7 +667,7 @@
                 });
                 pagination.appendChild(lastButton);
             }
-            
+
             // 下一页按钮
             if (currentPage < totalPages) {
                 const nextButton = document.createElement('button');
@@ -533,8 +683,28 @@
         function checkSpelling(input, correctWord, icon) {
             const userInput = input.value.trim().toLowerCase();
             const correct = correctWord.toLowerCase();
-            
+
+            // Prevent duplicate stats update for same input session?
+            // Simple logic: update on first success or failure per focus session?
+            // For simplicity: update on every change that matches result? No, that's too much.
+            // Better: Update only when user hits Enter? Or just rely on visual feedback?
+            // User requirement: "自动记录". Usually means when they get it right or wrong.
+            // To avoid spamming stats while typing:
+            // 1. Only mark correct when exact match.
+            // 2. Mark wrong? Hard to define "finished typing wrong".
+            // Let's stick to: If they enter correct word -> Correct ++.
+            // If they give up/check answer (not implemented yet) -> Wrong ++.
+            // Current code is oninput.
+            // Let's add a "checked" flag to the input element to avoid double counting?
+
             if (userInput === correct) {
+                if (!input.dataset.solved) {
+                    WordStats.update(correctWord, true);
+                    input.dataset.solved = "true";
+                    // Refresh stats view? No, might re-render and lose focus. 
+                    // Let's just update backend. Next render will show it.
+                }
+
                 icon.innerHTML = "✅";
                 icon.style.color = "green";
                 icon.style.display = "inline";
@@ -545,6 +715,14 @@
                 input.style.borderColor = "#ddd";
                 input.style.backgroundColor = "#fafafa";
             } else {
+                // Check if it's a "complete" attempt? 
+                // Difficult to know oninput. 
+                // Maybe we only count WRONG when they click "Next" or "Reveal"?
+                // Or we can add an explicit "Check" button?
+                // The current UI is real-time. 
+                // Let's NOT count "Wrong" on simple typos while typing.
+                // We will count "Wrong" if they use the "Spell" (Show Answer) button.
+
                 icon.innerHTML = "❌";
                 icon.style.color = "red";
                 icon.style.display = "inline";
@@ -566,22 +744,25 @@
         }
 
         function showSpelling(word) {
+            // If user asks for answer, count as WRONG
+            WordStats.update(word, false);
+
             if (spellTimeout) {
                 clearTimeout(spellTimeout);
             }
-            
+
             const spellContainer = document.getElementById('spellContainer');
             const letters = word.split('');
-            
+
             spellContainer.innerHTML = `
                 <button class="close-spell" onclick="closeSpelling()">×</button>
                 ${letters.map((letter, index) => `
                     <span class="spell-letter" style="animation-delay: ${index * 0.3}s">${letter}</span>
                 `).join('')}
             `;
-            
+
             spellContainer.style.display = 'flex';
-            
+
             // 自动关闭并播放发音
             spellTimeout = setTimeout(() => {
                 closeSpelling();
@@ -598,10 +779,10 @@
         }
 
         // 添加触摸事件支持
-        document.addEventListener('touchstart', function() {}, true);
+        document.addEventListener('touchstart', function () { }, true);
 
         // 防止双击缩放
-        document.addEventListener('touchend', function(event) {
+        document.addEventListener('touchend', function (event) {
             const now = Date.now();
             if (this.lastTouchEnd && now - this.lastTouchEnd < 350) {
                 event.preventDefault();
@@ -617,7 +798,7 @@
                 'vocabulary.csv',
                 'data.csv'
             ];
-            
+
             for (let filename of csvFiles) {
                 try {
                     const response = await fetch(filename);
@@ -634,24 +815,26 @@
                     console.log(`尝试加载 ${filename} 失败:`, error);
                 }
             }
-            
+
             // 如果没有找到CSV文件，显示示例数据和文件选择按钮
             console.log('未找到CSV文件，显示示例数据');
             showExampleData();
         }
 
         function parseCSVData(text, filename) {
-            wordData = text.split('\n').map(line => {
+            allWordData = text.split('\n').map(line => {
                 const parts = line.split(',');
-                return parts.length >= 2 ? { 
-                    english: parts[0].trim(), 
-                    chinese: parts.slice(1).join(',').trim() 
+                return parts.length >= 2 ? {
+                    english: parts[0].trim(),
+                    chinese: parts.slice(1).join(',').trim()
                 } : null;
             }).filter(word => word && word.english && word.chinese);
-            
-            if (wordData.length > 0) {
-                document.querySelector('.file-status').textContent = `已加载: ${filename} (${wordData.length}个单词)`;
+
+            if (allWordData.length > 0) {
+                document.querySelector('.file-status').textContent = `已加载: ${filename} (${allWordData.length}个单词)`;
                 document.querySelector('.file-status').style.color = '#28a745';
+
+                filterData();
                 renderPage(1);
                 renderPagination();
             } else {
@@ -665,7 +848,7 @@
         }
 
         function showExampleData() {
-            wordData = [
+            allWordData = [
                 { english: 'hello', chinese: '你好' },
                 { english: 'world', chinese: '世界' },
                 { english: 'computer', chinese: '计算机' },
@@ -674,6 +857,8 @@
             ];
             document.querySelector('.file-status').textContent = '使用示例数据 (5个单词)';
             document.querySelector('.file-status').style.color = '#ffc107';
+
+            filterData();
             renderPage(1);
             renderPagination();
         }
@@ -683,4 +868,5 @@
     </script>
 
 </body>
+
 </html>
