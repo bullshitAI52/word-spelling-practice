@@ -2,3 +2,5 @@ pandas
 genanki
 gtts
 playsound
+python-docx
+openpyxl
