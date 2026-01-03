@@ -54,6 +54,14 @@ This project contains a collection of Python scripts and web tools for English w
   2.  把收集到的 Word 文件都放到 `Files` 文件夹里。
   3.  运行 `python 提取Word表格写入到Excel.py`。
 
+#### 6. `phonetics_remover_gui.py` (Phonetics Remover / 音标去除工具)
+- **功能**: 批量清除文本或表格中被斜杠 `/.*/` 包围的音标内容，并支持 Excel/CSV 格式转换。
+- **特点**: 
+  - 🧹 **一键净化**: 自动识别并删除 `/kæl.kjə.leɪ.tər/` 格式的音标。
+  - 📊 **格式通用**: 支持 Excel (.xlsx), CSV, TXT 文件的导入和导出。
+  - 🛡️ **智能处理**: 能够保留其他文本，只删除音标部分。
+- **用法**: 运行 `python phonetics_remover_gui.py`，选择文件后点击处理。
+
 ---
 
 ## ⚙️ Installation (安装与配置)

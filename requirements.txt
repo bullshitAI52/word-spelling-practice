@@ -4,3 +4,4 @@ gtts
 playsound
 python-docx
 openpyxl
+pandas
