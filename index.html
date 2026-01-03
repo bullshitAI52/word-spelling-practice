@@ -7,6 +7,34 @@
     <title>英语单词拼写检测</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root {
+            --bg-color: #f5f7fa;
+            --text-color: #333;
+            --text-secondary: #666;
+            --card-bg: white;
+            --border-color: #eee;
+            --input-bg: #fafafa;
+            --input-border: #ddd;
+            --primary-color: #007BFF;
+            --sidebar-bg: white;
+            --sidebar-hover: #f0f7ff;
+            --sidebar-active: #e6f2ff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --card-bg: #2d2d2d;
+            --border-color: #404040;
+            --input-bg: #333;
+            --input-border: #555;
+            --primary-color: #4da3ff;
+            --sidebar-bg: #2d2d2d;
+            --sidebar-hover: #3d3d3d;
+            --sidebar-active: #404040;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,15 +43,17 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f5f7fa;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             padding: 10px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .header {
             text-align: center;
             font-size: clamp(20px, 5vw, 28px);
             font-weight: bold;
-            color: #007BFF;
+            color: var(--primary-color);
             margin-bottom: 15px;
         }
 
@@ -35,9 +65,10 @@
             align-items: center;
             margin-bottom: 20px;
             padding: 15px;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s;
         }
 
         .control-bar>* {
@@ -46,7 +77,7 @@
 
         .time-display {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             text-align: center;
             width: 100%;
             margin-bottom: 10px;
@@ -76,9 +107,9 @@
         }
 
         .mode-btn {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            color: #666;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 14px;
@@ -87,9 +118,9 @@
         }
 
         .mode-btn.active {
-            background-color: #007BFF;
+            background-color: var(--primary-color);
             color: white;
-            border-color: #007BFF;
+            border-color: var(--primary-color);
             box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
         }
 
@@ -121,12 +152,12 @@
         }
 
         .btn-primary {
-            background-color: #007BFF;
+            background-color: var(--primary-color);
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            opacity: 0.9;
         }
 
         .btn-secondary {
@@ -147,21 +178,22 @@
 
         .file-status {
             font-size: 12px;
-            color: #666;
+            color: var(--text-secondary);
             text-align: center;
             margin-top: 5px;
         }
 
         .container {
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            transition: background 0.3s;
         }
 
         .word-item {
             padding: 20px 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -174,7 +206,7 @@
         .chinese-text {
             font-size: 18px;
             font-weight: 500;
-            color: #333;
+            color: var(--text-color);
             text-align: left;
         }
 
@@ -189,17 +221,17 @@
             padding: 12px;
             font-size: 18px;
             font-weight: bold;
-            color: #007BFF;
-            border: 2px solid #ddd;
+            color: var(--primary-color);
+            border: 2px solid var(--input-border);
             border-radius: 8px;
-            background-color: #fafafa;
+            background-color: var(--input-bg);
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background-color 0.3s;
         }
 
         .input-box:focus {
-            border-color: #007BFF;
-            background-color: white;
+            border-color: var(--primary-color);
+            background-color: var(--card-bg);
         }
 
         .check-icon {
@@ -263,19 +295,19 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            background-color: #f8f9fa;
-            color: #495057;
+            background-color: var(--input-bg);
+            color: var(--text-secondary);
             font-weight: 500;
             transition: all 0.3s;
         }
 
         .pagination button.active {
-            background-color: #007BFF;
+            background-color: var(--primary-color);
             color: white;
         }
 
         .pagination button:hover:not(.active) {
-            background-color: #e9ecef;
+            background-color: var(--border-color);
         }
 
         .fullscreen-spell {
@@ -408,7 +440,7 @@
         }
 
         .modal-card {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
             text-align: center;
@@ -416,6 +448,7 @@
             width: 400px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             animation: slideUp 0.3s ease-out;
+            color: var(--text-color);
         }
 
         @keyframes slideUp {
@@ -434,11 +467,11 @@
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 15px;
-            color: #333;
+            color: var(--text-color);
         }
 
         .modal-text {
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 25px;
             line-height: 1.5;
         }
@@ -456,13 +489,14 @@
             top: 0;
             width: 260px;
             height: 100%;
-            background: white;
+            background: var(--sidebar-bg);
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1500;
             transition: left 0.3s ease;
             padding: 20px;
             display: flex;
             flex-direction: column;
+            color: var(--text-color);
         }
 
         .library-drawer.open {
@@ -476,7 +510,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #333;
+            color: var(--text-color);
         }
 
         .library-list {
@@ -487,26 +521,26 @@
 
         .library-item {
             padding: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             transition: background 0.2s;
             font-size: 14px;
-            color: #555;
+            color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .library-item:hover {
-            background-color: #f0f7ff;
-            color: #007BFF;
+            background-color: var(--sidebar-hover);
+            color: var(--primary-color);
         }
 
         .library-item.active {
-            background-color: #e6f2ff;
-            color: #007BFF;
+            background-color: var(--sidebar-active);
+            color: var(--primary-color);
             font-weight: bold;
-            border-left: 3px solid #007BFF;
+            border-left: 3px solid var(--primary-color);
         }
 
         .library-toggle {
@@ -514,8 +548,8 @@
             left: 20px;
             top: 20px;
             z-index: 1400;
-            background: white;
-            border: 1px solid #ddd;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -524,11 +558,34 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1400;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 20px;
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="切换日间/夜间模式">🌓</button>
 
     <!-- Library Toggle Button -->
     <button class="library-toggle" onclick="toggleLibrary()" title="打开词库列表">📚</button>
@@ -1143,7 +1200,22 @@
         }
 
         // 页面加载完成后自动尝试加载CSV
-        document.addEventListener('DOMContentLoaded', autoLoadCSV);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme Initialization
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            autoLoadCSV();
+        });
+
+        // --- Theme Feature ---
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
 
         // --- Library Feature ---
         let libraryFiles = [];
