@@ -144,7 +144,15 @@
             justify-content: center;
         }
 
-                .textbook-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 10px; }
+                        .daily-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .daily-table th, .daily-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #e5e5e5; }
+        .daily-table th { color: #777; font-weight: 700; background: #f7f7f7; }
+        .daily-table tr.today-row td { background: #eef9e6; font-weight: 700; }
+        .rate-good { color: #46A302; font-weight: 800; }
+        .rate-mid { color: #e89c00; font-weight: 800; }
+        .rate-bad { color: #FF4B4B; font-weight: 800; }
+        .daily-today { background: #f0f9ff; border: 1px solid #bde3ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.9; }
+        .textbook-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 10px; }
         .textbook-label { font-weight: 700; color: var(--text-main, #4B4B4B); margin-right: 2px; }
         .tb-btn { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 16px; border-radius: 12px; border: 2px solid #58CC02; background: #fff; color: #46A302; font-weight: 800; font-size: 18px; cursor: pointer; min-height: 44px; box-shadow: 0 3px 0 #46A302; font-family: inherit; }
         .tb-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #46A302; }
@@ -985,6 +993,7 @@
             <button class="mode-btn" onclick="switchMode('mistake')">❌ 易错题</button>
             <button class="mode-btn" onclick="switchMode('review')">🔁 今日复习 <span id="reviewBadge" class="mode-badge" style="display:none"></span></button>
             <button class="mode-btn" onclick="switchMode('dictation')">🎧 听写</button>
+            <button class="btn btn-secondary" onclick="openDailyModal()" style="margin-left: 5px; font-size: 12px; padding: 5px 12px;">📅 学习记录</button>
         </div>
 
         <div class="textbook-bar">
@@ -1019,6 +1028,17 @@
     </div>
 
     <!-- Resume Modal -->
+        <!-- Daily Learning Record Modal -->
+    <div class="modal-overlay" id="dailyModal">
+        <div class="modal-card" style="width: 700px; max-width: 92%; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-title">📅 学习记录</div>
+            <div id="dailyContent" style="padding: 16px 20px; text-align: left;"></div>
+            <div class="modal-actions" style="padding: 0 20px 18px;">
+                <button class="btn btn-primary" onclick="closeDailyModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="resumeModal">
         <div class="modal-card">
             <div class="modal-title">发现上次练习进度</div>
@@ -1129,6 +1149,7 @@
                 stat.lastPracticed = Date.now();
                 this.save();
                 if (typeof WordSRS !== 'undefined') WordSRS.record(word, isCorrect);
+                if (typeof DailyLog !== 'undefined') DailyLog.record(word, isCorrect);
             }
         };
 
@@ -1657,6 +1678,53 @@
             var b = TEXTBOOK_BOOKS[key];
             if (!b) return;
             parseCSVData(b.csv, b.title + '.csv');
+        }
+
+        // --- Daily learning record (每日完成情况 + 错误率) ---
+        var DailyLog = {
+            KEY: 'word_spelling_daily',
+            load: function() { try { return JSON.parse(localStorage.getItem(this.KEY)) || {}; } catch (e) { return {}; } },
+            save: function(d) { try { localStorage.setItem(this.KEY, JSON.stringify(d)); } catch (e) {} },
+            todayKey: function() { var d = new Date(); function p(n) { return (n < 10 ? '0' : '') + n; } return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); },
+            record: function(word, isCorrect) {
+                var all = this.load(); var k = this.todayKey();
+                var day = all[k] || { a: 0, c: 0, w: 0, words: {} };
+                day.a++; if (isCorrect) day.c++; else day.w++;
+                if (word) day.words[word] = 1;
+                all[k] = day; this.save(all);
+            },
+            rows: function() {
+                var all = this.load();
+                return Object.keys(all).sort().reverse().map(function(k) {
+                    var d = all[k];
+                    return { date: k, a: d.a, c: d.c, w: d.w, u: Object.keys(d.words || {}).length, rate: d.a ? Math.round(d.w / d.a * 100) : 0 };
+                });
+            }
+        };
+        function rateClass(r) { return r <= 15 ? 'rate-good' : (r <= 35 ? 'rate-mid' : 'rate-bad'); }
+        function openDailyModal() { renderDaily(); document.getElementById('dailyModal').style.display = 'flex'; }
+        function closeDailyModal() { document.getElementById('dailyModal').style.display = 'none'; }
+        function renderDaily() {
+            var el = document.getElementById('dailyContent');
+            var rows = DailyLog.rows();
+            if (!rows.length) { el.innerHTML = '<p style="color:#888; line-height:1.9;">还没有记录。从今天开始，每次练习都会自动记下来：哪天练了多少、答对答错多少、错误率多少，都在这里看。</p>'; return; }
+            var tk = DailyLog.todayKey();
+            var t = null, ta = 0, tc = 0, tw = 0;
+            rows.forEach(function(r) { ta += r.a; tc += r.c; tw += r.w; if (r.date === tk) t = r; });
+            var html = '';
+            if (t) {
+                html += '<div class="daily-today"><strong>今天（' + t.date + '）</strong><br>练习 <strong>' + t.a + '</strong> 词次 · ✅ 答对 ' + t.c + ' · ❌ 答错 ' + t.w + ' · 错误率 <span class="' + rateClass(t.rate) + '">' + t.rate + '%</span> · 一共练了 ' + t.u + ' 个不同的词</div>';
+            } else {
+                html += '<div class="daily-today"><strong>今天（' + tk + '）</strong><br>今天还没开始练习，点一个词库开始吧。</div>';
+            }
+            html += '<table class="daily-table"><tr><th>日期</th><th>练习</th><th>答对</th><th>答错</th><th>错误率</th><th>单词数</th></tr>';
+            rows.forEach(function(r) {
+                html += '<tr' + (r.date === tk ? ' class="today-row"' : '') + '><td>' + r.date + (r.date === tk ? '（今天）' : '') + '</td><td>' + r.a + '</td><td>' + r.c + '</td><td>' + r.w + '</td><td class="' + rateClass(r.rate) + '">' + r.rate + '%</td><td>' + r.u + '</td></tr>';
+            });
+            html += '</table>';
+            var totalRate = ta ? Math.round(tw / ta * 100) : 0;
+            html += '<p style="color:#888; margin-top:12px;">累计 ' + rows.length + ' 天 · 总练习 ' + ta + ' 词次 · 总错误率 <span class="' + rateClass(totalRate) + '">' + totalRate + '%</span>（错误率 ≤15% 绿色 · ≤35% 黄色 · 更高红色）</p>';
+            el.innerHTML = html;
         }
         function parseCSVData(text, filename, save = true) {
             allWordData = text.split('\n').map(line => {
