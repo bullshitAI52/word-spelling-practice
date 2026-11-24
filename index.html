@@ -8,40 +8,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --bg-color: #FFF9F0;
-            --text-color: #2B2118;
-            --text-secondary: #7A6A58;
+            --bg-color: #F7F7F7;
+            --text-color: #4B4B4B;
+            --text-secondary: #777777;
             --card-bg: #FFFFFF;
-            --border-color: #F0E2CD;
-            --input-bg: #FFFDF8;
-            --input-border: #E8D9BE;
-            --primary-color: #FF8A00;
-            --primary-hover: #FF9E2C;
-            --primary-deep: #D96F00;
-            --soft-bg: #F7EDDA;
+            --border-color: #E5E5E5;
+            --input-bg: #FFFFFF;
+            --input-border: #E5E5E5;
+            --primary-color: #58CC02;
+            --primary-hover: #61E002;
+            --primary-deep: #46A302;
+            --soft-bg: #F0F0F0;
             --sidebar-bg: #FFFFFF;
-            --sidebar-hover: #FFF3E0;
-            --sidebar-active: #FFE8C7;
-            --success-color: #22B573;
-            --danger-color: #FF5A5F;
+            --sidebar-hover: #F7F7F7;
+            --sidebar-active: #EAF9DC;
+            --success-color: #58CC02;
+            --danger-color: #FF4B4B;
         }
 
         [data-theme="dark"] {
-            --bg-color: #1E1A16;
-            --text-color: #F2E9DC;
-            --text-secondary: #B8A88F;
-            --card-bg: #2A251F;
-            --border-color: #453B2F;
-            --input-bg: #2F2820;
-            --input-border: #55462F;
-            --primary-color: #FFA63D;
-            --primary-hover: #FFB35C;
-            --primary-deep: #D98A26;
-            --soft-bg: #3A3128;
-            --sidebar-bg: #2A251F;
-            --sidebar-hover: #3A3128;
-            --sidebar-active: #4A3A26;
-            --success-color: #2ECC85;
+            --bg-color: #131F24;
+            --text-color: #E8F0F2;
+            --text-secondary: #A7B8BF;
+            --card-bg: #1E2A33;
+            --border-color: #37464F;
+            --input-bg: #16222A;
+            --input-border: #37464F;
+            --primary-color: #58CC02;
+            --primary-hover: #61E002;
+            --primary-deep: #46A302;
+            --soft-bg: #2A3B47;
+            --sidebar-bg: #1E2A33;
+            --sidebar-hover: #2A3B47;
+            --sidebar-active: #2F4A2A;
+            --success-color: #58CC02;
             --danger-color: #FF7A7E;
         }
 
@@ -60,12 +60,12 @@
         }
 
         ::selection {
-            background: rgba(255, 138, 0, 0.28);
+            background: rgba(88, 204, 2, 0.25);
         }
 
         button:focus-visible,
         input:focus-visible {
-            outline: 3px solid rgba(255, 138, 0, 0.55);
+            outline: 3px solid rgba(28, 176, 246, 0.6);
             outline-offset: 2px;
         }
 
@@ -74,7 +74,7 @@
             font-size: clamp(24px, 5vw, 34px);
             font-weight: 900;
             letter-spacing: 0.02em;
-            color: var(--text-color);
+            color: var(--primary-deep);
             margin: 6px auto 14px;
             max-width: 880px;
         }
@@ -185,13 +185,13 @@
         }
 
         .stat-badge.wrong {
-            color: #E5484D;
-            background: #FFE9E9;
+            color: #FF4B4B;
+            background: #FFE8E8;
         }
 
         .stat-badge.correct {
-            color: #1D9E63;
-            background: #E4F8EC;
+            color: #46A302;
+            background: #EAF9DC;
         }
 
         [data-theme="dark"] .stat-badge.wrong {
@@ -200,7 +200,7 @@
         }
 
         [data-theme="dark"] .stat-badge.correct {
-            color: #5FD68F;
+            color: #7ED957;
             background: #274435;
         }
 
@@ -310,14 +310,14 @@
         }
 
         .input-box::placeholder {
-            color: #B8A88F;
+            color: #BDBDBD;
             font-weight: 500;
         }
 
         .input-box:focus {
             border-color: var(--primary-color);
             background-color: var(--card-bg);
-            box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.18);
+            box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.22);
         }
 
         .check-icon {
@@ -354,7 +354,7 @@
         }
 
         .btn-sound {
-            background-color: var(--success-color);
+            background-color: #1CB0F6;
             color: white;
         }
 
@@ -363,12 +363,12 @@
         }
 
         .btn-spell {
-            background-color: #FFC93D;
+            background-color: #FFC800;
             color: #5B4300;
         }
 
         .btn-spell:hover {
-            background-color: #FFBE1A;
+            background-color: #F0B400;
         }
 
         .pagination {
@@ -420,7 +420,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(24, 18, 12, 0.96);
+            background: rgba(19, 31, 36, 0.97);
             color: white;
             display: none;
             justify-content: center;
@@ -431,7 +431,7 @@
         }
 
         .spell-letter {
-            color: #FFC93D;
+            color: #FFC800;
             font-weight: bold;
             font-size: clamp(40px, 12vw, 100px);
             margin: 0 clamp(5px, 2vw, 20px);
@@ -473,7 +473,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(30, 22, 14, 0.5);
+            background: rgba(19, 31, 36, 0.5);
             backdrop-filter: blur(3px);
             display: none;
             justify-content: center;
@@ -874,6 +874,75 @@
                 padding: 8px;
             }
         }
+
+        /* Review badge + dictation */
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: #FF4B4B;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .dictation-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-listen {
+            width: 72px;
+            height: 72px;
+            min-width: 72px;
+            border-radius: 50%;
+            border: none;
+            background: #1CB0F6;
+            color: #fff;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.18), 0 3px 8px rgba(75, 75, 75, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-listen:active {
+            transform: translateY(2px);
+        }
+
+        .dictation-side {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+        }
+
+        .dictation-tip {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .peek-btn {
+            background: none;
+            border: none;
+            color: #1CB0F6;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            padding: 4px 0;
+            min-height: 32px;
+        }
     </style>
 </head>
 
@@ -909,6 +978,8 @@
             <button class="mode-btn active" onclick="switchMode('all')">📚 全部练习</button>
             <button class="mode-btn" onclick="switchMode('new')">🆕 未背诵</button>
             <button class="mode-btn" onclick="switchMode('mistake')">❌ 易错题</button>
+            <button class="mode-btn" onclick="switchMode('review')">🔁 今日复习 <span id="reviewBadge" class="mode-badge" style="display:none"></span></button>
+            <button class="mode-btn" onclick="switchMode('dictation')">🎧 听写</button>
         </div>
 
         <div class="time-display" id="currentTime"></div>
@@ -1040,8 +1111,93 @@
                 else stat.wrong++;
                 stat.lastPracticed = Date.now();
                 this.save();
+                if (typeof WordSRS !== 'undefined') WordSRS.record(word, isCorrect);
             }
         };
+
+        // --- Spaced Repetition (今日复习) ---
+        const WordSRS = {
+            storageKey: 'word_spelling_srs',
+            data: {},
+            intervals: [1, 2, 4, 7, 15, 30],
+
+            init() {
+                try {
+                    this.data = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+                } catch (e) {
+                    this.data = {};
+                }
+            },
+
+            save() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+            },
+
+            startOfDay(ts) {
+                const d = new Date(ts);
+                d.setHours(0, 0, 0, 0);
+                return d.getTime();
+            },
+
+            get(word) {
+                if (this.data[word]) return this.data[word];
+                // Words practiced before SRS existed: derive a schedule from their stats
+                const st = WordStats.get(word);
+                if (st.correct === 0 && st.wrong === 0) return null;
+                let level = 0;
+                if (st.wrong === 0 && st.correct >= 3) level = 3;
+                else if (st.correct >= 2) level = 2;
+                else if (st.correct >= 1) level = 1;
+                const rec = {
+                    level: level,
+                    due: this.startOfDay(st.lastPracticed || Date.now()) + this.intervals[level] * 86400000
+                };
+                this.data[word] = rec;
+                this.save();
+                return rec;
+            },
+
+            record(word, isCorrect) {
+                let rec = this.data[word] || { level: 0, due: 0 };
+                if (isCorrect) {
+                    rec.due = this.startOfDay(Date.now()) + this.intervals[Math.min(rec.level, this.intervals.length - 1)] * 86400000;
+                    rec.level = Math.min(rec.level + 1, this.intervals.length - 1);
+                } else {
+                    rec.level = 0;
+                    rec.due = this.startOfDay(Date.now()) + 86400000;
+                }
+                this.data[word] = rec;
+                this.save();
+            },
+
+            dueWords() {
+                const endToday = this.startOfDay(Date.now()) + 86400000;
+                return allWordData
+                    .filter(w => {
+                        const r = this.get(w.english);
+                        return r && r.due < endToday;
+                    })
+                    .sort((a, b) => this.get(a.english).due - this.get(b.english).due);
+            }
+        };
+        WordSRS.init();
+
+        function updateReviewBadge() {
+            const badge = document.getElementById('reviewBadge');
+            if (!badge || typeof allWordData === 'undefined' || !allWordData.length) return;
+            const count = WordSRS.dueWords().length;
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline-flex' : 'none';
+        }
+
+        function togglePeek(btn) {
+            const item = btn.closest('.word-item');
+            const box = item ? item.querySelector('.dictation-chinese') : null;
+            if (box) {
+                box.style.display = 'block';
+                btn.style.display = 'none';
+            }
+        }
 
         WordStats.init();
 
@@ -1075,6 +1231,10 @@
                     const statsB = WordStats.get(b.english);
                     return statsB.wrong - statsA.wrong; // Descending order of mistakes
                 });
+            } else if (currentMode === 'review') {
+                displayData = WordSRS.dueWords();
+            } else if (currentMode === 'dictation') {
+                displayData = [...allWordData];
             }
 
             // If mistake/new mode is empty, show alert or fallback? 
@@ -1138,27 +1298,29 @@
         function renderPage(page) {
             currentPage = page;
             DataPersistence.savePage(page); // Save current page
+            updateReviewBadge();
             const start = (page - 1) * WORDS_PER_PAGE;
 
             if (displayData.length === 0) {
-                document.getElementById('wordList').innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">当前模式下没有单词哦 🎉</div>`;
+                const emptyMsg = currentMode === 'review' ? '今天没有要复习的单词，去学几个新词吧 🎉' : '当前模式下没有单词哦 🎉';
+                document.getElementById('wordList').innerHTML = `<div style="text-align:center; padding: 20px; color: #666;">${emptyMsg}</div>`;
                 return;
             }
 
             const words = displayData.slice(start, start + WORDS_PER_PAGE);
+            const isDictation = currentMode === 'dictation';
             document.getElementById('wordList').innerHTML = words.map((word, index) => {
                 const stats = WordStats.get(word.english);
-                return `
-                <div class="word-item">
-                    <div class="chinese-text">${word.chinese}</div>
+                const statsHtml = `
                     <div class="word-stats">
-                        历史记录: 
+                        历史记录:
                         <span class="stat-badge correct">✅ ${stats.correct}</span>
                         <span class="stat-badge wrong">❌ ${stats.wrong}</span>
-                    </div>
+                    </div>`;
+                const inputHtml = `
                     <div class="input-container">
-                        <input type="text" class="input-box" 
-                               placeholder="请输入英文单词..." 
+                        <input type="text" class="input-box"
+                               placeholder="请输入英文单词..."
                                oninput="checkSpelling(this, '${word.english}', this.nextElementSibling)"
                                autocomplete="off"
                                autocorrect="off"
@@ -1169,9 +1331,32 @@
                     <div class="action-buttons">
                         <button class="btn-icon btn-sound" onclick="playSound('${word.english}')" title="播放发音">🔊</button>
                         <button class="btn-icon btn-spell" onclick="showSpelling('${word.english}')" title="拼写示范">✏️</button>
+                    </div>`;
+                if (isDictation) {
+                    return `
+                <div class="word-item">
+                    <div class="dictation-row">
+                        <button class="btn-listen" onclick="playSound('${word.english}')" title="再听一遍">🔊</button>
+                        <div class="dictation-side">
+                            <div class="dictation-tip">听发音，拼出这个单词</div>
+                            <div class="dictation-chinese chinese-text" style="display:none;">${word.chinese}</div>
+                            <button class="peek-btn" onclick="togglePeek(this)">偷看中文 👀</button>
+                        </div>
                     </div>
+                    ${statsHtml}
+                    ${inputHtml}
+                </div>`;
+                }
+                return `
+                <div class="word-item">
+                    <div class="chinese-text">${word.chinese}</div>
+                    ${statsHtml}
+                    ${inputHtml}
                 </div>
             `}).join('');
+            if (isDictation && words.length > 0) {
+                setTimeout(() => playSound(words[0].english), 350);
+            }
         }
 
         function renderPagination() {
