@@ -1061,6 +1061,8 @@
 .pos-num { background: #EF5350; }
 .pos-conj { background: #78909C; }
 .pos-phr { background: #607D8B; }
+.btn-form { background: #E8F5E9 !important; }
+.forms-line { display: none; width: 100%; margin-top: 8px; font-size: 15px; line-height: 1.7; color: #555; background: #f4fbf2; border: 1px solid #cfe8c8; border-radius: 8px; padding: 8px 10px; text-align: left; box-sizing: border-box; }
 .pos-modal { background: #AB47BC; }
 </style>
 </head>
@@ -1512,8 +1514,10 @@
                         <button class="btn-icon btn-spell" onclick="showSpelling('${word.english}')" title="拼写示范">✏️</button>
                         <button class="btn-icon btn-hint" onclick="showHint(this, '${word.english}')" title="提示">💡</button>
                         <button class="btn-icon btn-ex" onclick="toggleExample(this, '${word.english}')" title="例句">📖</button>
+                        ${formsBtn(word.english)}
                         <div class="hint-line"></div>
                         <div class="ex-line"></div>
+                        <div class="forms-line"></div>
                     </div>`;
                 if (isDictation) {
                     return `
@@ -2368,10 +2372,27 @@ var WORD_FORMS = {"Alaska": {"pill": "专有名词", "cls": "n", "info": ""}, "a
 function posBadge(en) {
     if (!en) return '';
     var f = WORD_FORMS[en] || WORD_FORMS[String(en).toLowerCase()];
-    if (f) return '<span class="pos-badge pos-' + f.cls + '">' + f.pill + '</span>' + (f.info ? '<span class="pos-info">' + f.info + '</span>' : '');
+    if (f) return '<span class="pos-badge pos-' + f.cls + '">' + f.pill + '</span>';
     var c = WORD_POS[en] || WORD_POS[String(en).toLowerCase()];
     if (!c || !POS_LABELS[c]) return '';
     return '<span class="pos-badge pos-' + c + '">' + POS_LABELS[c] + '</span>';
+}
+function formsInfo(en) {
+    if (!en) return '';
+    var f = WORD_FORMS[en] || WORD_FORMS[String(en).toLowerCase()];
+    return f ? f.info : '';
+}
+function formsBtn(en) {
+    if (!formsInfo(en)) return '';
+    return '<button class="btn-icon btn-form" onclick="toggleForms(this, \'' + String(en).replace(/'/g, "\\'") + '\')" title="变形（复数 / 过去式 / 三单）">🔤</button>';
+}
+function toggleForms(btn, en) {
+    var card = btn.closest('.word-item');
+    var line = card.querySelector('.forms-line');
+    if (!line) return;
+    if (line.style.display === 'block') { line.style.display = 'none'; return; }
+    line.innerText = '🔤 ' + formsInfo(en);
+    line.style.display = 'block';
 }
 function printEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function openPrintModal() {
