@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>英语单词拼写检测</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         :root {
             --bg-color: #F7F7F7;
@@ -801,16 +801,9 @@
                 font-size: 14px;
             }
 
-            #timerBtn,
-            #screenshotBtn {
-                font-size: 14px;
-                padding: 9px 16px;
-            }
+            
 
-            #elapsedTimeDisplay {
-                font-size: 13px;
-                text-align: center;
-            }
+            
 
             #helpModal .modal-card {
                 font-size: 15px;
@@ -1114,9 +1107,7 @@
 
         <div class="file-status">正在加载...</div>
 
-        <button id="timerBtn" class="btn btn-secondary">⏱️ 开始计时</button>
-        <span id="elapsedTimeDisplay">已用时间: 0 秒</span>
-        <button id="screenshotBtn" class="btn btn-secondary">📷 截图保存</button>
+        
     </div>
 
     <div class="container">
@@ -1217,7 +1208,6 @@
         let allWordData = []; // Store complete dataset
         let displayData = []; // Store filtered data for display
         let currentPage = 1;
-        let startTime;
         let spellTimeout;
         let currentMode = 'all'; // 'all', 'new', 'mistake'
         const WORDS_PER_PAGE = 3;
@@ -1455,33 +1445,9 @@
             document.getElementById('fileInput').click();
         });
 
-        document.getElementById('timerBtn').addEventListener('click', () => {
-            if (!startTime) {
-                startTime = Date.now();
-                document.getElementById('timerBtn').textContent = '⏸️ 停止计时';
-                setInterval(() => {
-                    if (startTime) {
-                        let elapsed = Math.floor((Date.now() - startTime) / 1000);
-                        document.getElementById('elapsedTimeDisplay').textContent = `已用时间: ${elapsed} 秒`;
-                    }
-                }, 1000);
-            } else {
-                startTime = null;
-                document.getElementById('timerBtn').textContent = '⏱️ 开始计时';
-            }
-        });
+        
 
-        document.getElementById('screenshotBtn').addEventListener('click', () => {
-            html2canvas(document.body, {
-                scale: window.devicePixelRatio || 1,
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `拼写检测截图_${new Date().toISOString().slice(0, 19)}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        });
+        
 
         document.getElementById('fileInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
