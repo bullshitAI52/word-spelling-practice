@@ -1025,7 +1025,34 @@
     
         .part-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; font-weight: 700; }
         .part-row:empty { display: none; }
-    </style>
+    
+/* ===== 打印词单 ===== */
+.duo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0 4px; }
+.duo-row .reverse-open-btn { width: 100%; margin: 0; }
+.print-open-btn { width: 100%; min-height: 48px; border: none; border-bottom: 4px solid #1899D6; background: #1CB0F6; color: #fff; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; padding: 10px 6px; }
+.print-open-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+.print-modal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 1200; }
+.print-modal.open { display: flex; }
+.print-modal-box { background: #fff; border-radius: 18px; padding: 22px; width: min(92vw, 420px); box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+.print-modal-box h2 { margin: 0 0 6px; font-size: 20px; }
+.print-modal-box p { margin: 0 0 6px; color: #777; font-size: 14px; }
+.print-opt { display: block; width: 100%; min-height: 52px; margin: 10px 0 0; border: 2px solid #E5E5E5; border-bottom: 4px solid #E5E5E5; background: #fff; color: #4B4B4B; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; padding: 10px; text-align: left; }
+.print-opt:active { transform: translateY(2px); border-bottom-width: 2px; }
+#printArea { display: none; }
+@media print {
+    @page { margin: 12mm; }
+    body > *:not(#printArea) { display: none !important; }
+    #printArea { display: block !important; color: #000; font-family: sans-serif; }
+    #printArea h1 { font-size: 20px; margin: 0 0 4px; }
+    #printArea .pmeta { font-size: 12px; color: #444; margin: 0 0 10px; }
+    #printArea table { width: 100%; border-collapse: collapse; }
+    #printArea th, #printArea td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+    #printArea th { background: #eee; font-size: 13px; }
+    #printArea td.en { font-size: 17px; font-weight: 700; }
+    #printArea td.zh { font-size: 14px; }
+    #printArea td.write { height: 30px; }
+}
+</style>
 </head>
 
 <body>
@@ -1069,7 +1096,10 @@
         <div class="unit-bar" id="unitBar"></div>
         <button class="diy-open-btn" onclick="openDiyModal()">🧩 自由DIY（家长挑词 · 背句子）</button>
         <div class="school-bar" id="schoolBar"></div>
-        <button class="reverse-open-btn" id="reverseBtn" onclick="toggleReverse()">🔁 反向选义（看英文选中文）</button>
+        <div class="duo-row">
+            <button class="reverse-open-btn" id="reverseBtn" onclick="toggleReverse()">🔁 反向选义（看英文选中文）</button>
+            <button class="print-open-btn" onclick="openPrintModal()">🖨️ 打印词单 / 听写纸</button>
+        </div>
 
         <div class="time-display" id="currentTime"></div>
 
@@ -2310,7 +2340,37 @@
         var reverseActive = false;
         function updateReverseBtn() { var b = document.getElementById('reverseBtn'); if (b) b.innerText = reverseActive ? '↩️ 退出反向选义' : '🔁 反向选义（看英文选中文）'; }
         function resetReverse() { reverseActive = false; updateReverseBtn(); }
-        function toggleReverse() {
+        /* ===== 打印词单 / 听写纸 ===== */
+function printEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function openPrintModal() {
+    if (typeof allWordData === 'undefined' || !allWordData.length) { alert('先选一册书、一个单元或一份词单，把词加载出来再打印。'); return; }
+    document.getElementById('printModalInfo').textContent = '当前词单共 ' + allWordData.length + ' 词，选一种打印：';
+    document.getElementById('printModal').classList.add('open');
+}
+function closePrintModal() { document.getElementById('printModal').classList.remove('open'); }
+function doPrintChoice(kind) { closePrintModal(); setTimeout(function() { printWordList(kind); }, 80); }
+function printWordList(kind) {
+    if (typeof allWordData === 'undefined' || !allWordData.length) { alert('先选一册书、一个单元或一份词单，把词加载出来再打印。'); return; }
+    var statusEl = document.querySelector('.file-status');
+    var title = statusEl ? statusEl.textContent.replace(/^\s*已加载[:：]\s*/, '').replace(/\.csv.*$/, '') : '';
+    if (!title || title.indexOf('未') === 0) title = '单词表';
+    var now = new Date();
+    var ds = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+    var rows = '', i, w;
+    if (kind === 'dictation') {
+        for (i = 0; i < allWordData.length; i++) { w = allWordData[i]; rows += '<tr><td>' + (i + 1) + '</td><td class="zh">' + printEsc(w.chinese) + '</td><td class="write"></td></tr>'; }
+        document.getElementById('printArea').innerHTML = '<h1>' + printEsc(title) + ' · 听写纸</h1>' +
+            '<p class="pmeta">姓名：____________　日期：____________　共 ' + allWordData.length + ' 词（看中文，默写英文）</p>' +
+            '<table><tr><th style="width:8%">#</th><th style="width:34%">中文</th><th>默写英文</th></tr>' + rows + '</table>';
+    } else {
+        for (i = 0; i < allWordData.length; i++) { w = allWordData[i]; rows += '<tr><td>' + (i + 1) + '</td><td class="en">' + printEsc(w.english) + '</td><td class="zh">' + printEsc(w.chinese) + '</td></tr>'; }
+        document.getElementById('printArea').innerHTML = '<h1>' + printEsc(title) + '</h1>' +
+            '<p class="pmeta">共 ' + allWordData.length + ' 词 · ' + ds + '</p>' +
+            '<table><tr><th style="width:8%">#</th><th style="width:42%">英文</th><th>中文</th></tr>' + rows + '</table>';
+    }
+    window.print();
+}
+function toggleReverse() {
             if (reverseActive) { reverseActive = false; updateReverseBtn(); renderPage(); }
             else { reverseActive = true; updateReverseBtn(); renderReverse(); }
         }
@@ -2531,6 +2591,16 @@
         }
     </script>
 
+<div id="printModal" class="print-modal" onclick="if(event.target===this)closePrintModal()">
+    <div class="print-modal-box">
+        <h2>🖨️ 打印</h2>
+        <p id="printModalInfo"></p>
+        <button class="print-opt" onclick="doPrintChoice('study')">📖 学习版：英文 + 中文（复习、贴墙看）</button>
+        <button class="print-opt" onclick="doPrintChoice('dictation')">✍️ 听写版：看中文写英文（带姓名、日期栏）</button>
+        <button class="print-opt" onclick="closePrintModal()">取消</button>
+    </div>
+</div>
+<div id="printArea"></div>
 </body>
 
 </html>
